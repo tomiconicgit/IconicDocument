@@ -2,46 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insane Text Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Insane Text Editor Pro</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- For PDF export -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
     <div id="toolbar">
-        <button onclick="execCmd('bold')"><b>B</b></button>
-        <button onclick="execCmd('italic')"><i>I</i></button>
-        <button onclick="execCmd('underline')"><u>U</u></button>
-        <button onclick="execCmd('strikeThrough')">S</button>
-        <button onclick="highlightText()">Highlight</button>
-        <button onclick="execCmd('insertUnorderedList')">• List</button>
-        <button onclick="execCmd('insertOrderedList')">1. List</button>
-        <button onclick="execCmd('justifyLeft')">Left</button>
-        <button onclick="execCmd('justifyCenter')">Center</button>
-        <button onclick="execCmd('justifyRight')">Right</button>
-        <button onclick="execCmd('justifyFull')">Justify</button>
-        <select onchange="execCmd('fontName', this.value)">
+        <button class="tool-btn" onclick="execCmd('bold')"><b>B</b></button>
+        <button class="tool-btn" onclick="execCmd('italic')"><i>I</i></button>
+        <button class="tool-btn" onclick="execCmd('underline')"><u>U</u></button>
+        <button class="tool-btn" onclick="execCmd('strikeThrough')">S</button>
+        <button class="tool-btn" onclick="execCmd('insertUnorderedList')">•</button>
+        <button class="tool-btn" onclick="execCmd('insertOrderedList')">1.</button>
+        <button class="tool-btn" onclick="execCmd('justifyLeft')">←</button>
+        <button class="tool-btn" onclick="execCmd('justifyCenter')">↔</button>
+        <button class="tool-btn" onclick="execCmd('justifyRight')">→</button>
+        <button class="tool-btn" onclick="execCmd('justifyFull')">↕</button>
+        <select class="tool-select" onchange="execCmd('fontName', this.value)">
             <option value="Arial">Arial</option>
+            <option value="Helvetica">Helvetica</option>
             <option value="Times New Roman">Times</option>
             <option value="Courier New">Courier</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Georgia">Georgia</option>
         </select>
-        <select onchange="execCmd('fontSize', this.value)">
-            <option value="1">Small</option>
+        <select class="tool-select" onchange="execCmd('fontSize', this.value)">
+            <option value="1">Tiny</option>
+            <option value="2">Small</option>
             <option value="3">Normal</option>
+            <option value="4">Medium</option>
             <option value="5">Large</option>
+            <option value="6">X-Large</option>
             <option value="7">Huge</option>
         </select>
-        <button onclick="execCmd('undo')">Undo</button>
-        <button onclick="execCmd('redo')">Redo</button>
-        <button onclick="findReplace()">Find/Replace</button>
-        <button onclick="insertImage()">Insert Image</button>
-        <button onclick="insertTable()">Insert Table</button>
-        <button onclick="toggleDarkMode()">Dark Mode</button>
-        <button onclick="startVoiceInput()">Voice Input</button>
-        <button onclick="autoSuggest()">Auto Suggest</button> <!-- New: AI-like suggestion (basic) -->
-        <button onclick="wordCount()">Word Count</button>
-        <button onclick="exportToPDF()">Export PDF</button>
-        <button onclick="autoSave()">Auto Save</button> <!-- Triggers manual save, but auto on input -->
+        <label class="tool-label">Text Color: <input type="color" onchange="execCmd('foreColor', this.value)"></label>
+        <label class="tool-label">Highlight: <input type="color" onchange="execCmd('hiliteColor', this.value)"></label>
+        <button class="tool-btn" onclick="execCmd('undo')">↩️</button>
+        <button class="tool-btn" onclick="execCmd('redo')">↪️</button>
+        <button class="tool-btn" onclick="findReplace()">🔍</button>
+        <button class="tool-btn" onclick="insertTable()">📊</button>
+        <button class="tool-btn" onclick="toggleDarkMode()">🌙</button>
+        <button class="tool-btn" onclick="startVoiceInput()">🎤</button>
+        <button class="tool-btn" onclick="autoSuggest()">🤖</button>
+        <button class="tool-btn" onclick="grammarCheck()">📝</button> <!-- New: Grammar Check -->
+        <button class="tool-btn" onclick="wordCount()">🔢</button>
+        <button class="tool-btn" onclick="exportToPDF()">📤 PDF</button>
+        <button class="tool-btn" onclick="autoSave()">💾</button>
     </div>
     <div id="editor" contenteditable="true" spellcheck="true"></div>
     <script src="script.js"></script>
