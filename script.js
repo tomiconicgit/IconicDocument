@@ -3,10 +3,6 @@ function execCmd(command, value = null) {
     document.execCommand(command, false, value);
 }
 
-function highlightText() {
-    execCmd('hiliteColor', '#FFFF00'); // Yellow highlight
-}
-
 function findReplace() {
     const find = prompt('Find:');
     if (!find) return;
@@ -17,22 +13,15 @@ function findReplace() {
     editor.innerHTML = text.replace(regex, replace);
 }
 
-function insertImage() {
-    const url = prompt('Image URL:');
-    if (url) {
-        execCmd('insertImage', url);
-    }
-}
-
 function insertTable() {
     const rows = prompt('Rows:');
     const cols = prompt('Columns:');
     if (rows && cols) {
-        let table = '<table border="1">';
+        let table = '<table border="1" style="border-collapse: collapse; width: 100%;">';
         for (let i = 0; i < rows; i++) {
             table += '<tr>';
             for (let j = 0; j < cols; j++) {
-                table += '<td>Cell</td>';
+                table += '<td contenteditable="true">Cell</td>';
             }
             table += '</tr>';
         }
@@ -47,41 +36,72 @@ function toggleDarkMode() {
 }
 
 function startVoiceInput() {
-    if ('webkitSpeechRecognition' in window) { // Safari compatible
+    if ('webkitSpeechRecognition' in window) {
         const recognition = new webkitSpeechRecognition();
         recognition.lang = 'en-US';
+        recognition.continuous = true;
+        recognition.interimResults = true;
         recognition.onresult = (event) => {
-            const text = event.results[0][0].transcript;
-            document.getElementById('editor').innerHTML += text + ' ';
+            let text = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                text += event.results[i][0].transcript;
+            }
+            document.getElementById('editor').innerHTML += text;
         };
         recognition.start();
+        setTimeout(() => recognition.stop(), 10000); // Stop after 10s to avoid infinite
     } else {
-        alert('Voice input not supported in this browser.');
+        alert('Voice input not supported.');
     }
 }
 
 function autoSuggest() {
-    // Basic auto-suggest: Suggest common phrases or corrections (client-side simple)
     const editor = document.getElementById('editor');
-    const text = editor.innerText;
-    const lastWord = text.split(' ').pop().toLowerCase();
+    const text = editor.innerText.trim();
+    const lastSentence = text.split(/[.!?]/).pop().trim();
     let suggestion = '';
-    if (lastWord === 'hello') suggestion = 'world';
-    else if (lastWord === 'the') suggestion = 'quick brown fox';
-    // Add more smart suggestions here, e.g., based on patterns
+    if (lastSentence.toLowerCase().includes('hello')) suggestion = ' How are you?';
+    else if (lastSentence.toLowerCase().includes('the')) suggestion = ' quick brown fox jumps over the lazy dog.';
+    // Expand with more patterns
     if (suggestion) {
-        const confirm = prompt(`Suggest: ${suggestion}? (y/n)`);
+        const confirm = prompt(`Suggest: "${suggestion}"? (y/n)`);
         if (confirm.toLowerCase() === 'y') {
-            editor.innerHTML += ' ' + suggestion;
+            editor.innerHTML += suggestion;
         }
     } else {
         alert('No suggestion available.');
     }
 }
 
+function grammarCheck() {
+    const editor = document.getElementById('editor');
+    let text = editor.innerText;
+    
+    // Basic grammar checks with regex
+    // Check for double spaces
+    text = text.replace(/\s{2,}/g, ' ');
+    
+    // Capitalize after periods
+    text = text.replace(/([.?!]\s*)([a-z])/g, (match, p1, p2) => p1 + p2.toUpperCase());
+    
+    // Simple passive voice detection (basic)
+    const passiveRegex = /\b(is|was|were|been|being|be)\b\s+\b\w+ed\b/gi;
+    if (passiveRegex.test(text)) {
+        alert('Possible passive voice detected. Consider active voice for clarity.');
+    }
+    
+    // Check for common errors like "your" vs "you're"
+    if (/\byour\b/gi.test(text)) {
+        alert('Check if "your" should be "you\'re".');
+    }
+    
+    editor.innerText = text;
+    alert('Basic grammar check complete. For advanced checks, use external tools.');
+}
+
 function wordCount() {
-    const text = document.getElementById('editor').innerText;
-    const count = text.trim().split(/\s+/).length;
+    const text = document.getElementById('editor').innerText.trim();
+    const count = text.split(/\s+/).length;
     alert(`Word count: ${count}`);
 }
 
@@ -95,13 +115,13 @@ function exportToPDF() {
 
 function autoSave() {
     const content = document.getElementById('editor').innerHTML;
-    localStorage.setItem('autoSave', content);
+    localStorage.setItem('autoSavePro', content);
     alert('Saved!');
 }
 
-// Load auto-saved content on load
+// Load auto-saved content
 window.onload = () => {
-    const saved = localStorage.getItem('autoSave');
+    const saved = localStorage.getItem('autoSavePro');
     if (saved) {
         document.getElementById('editor').innerHTML = saved;
     }
@@ -110,14 +130,10 @@ window.onload = () => {
 // Auto-save every 30 seconds
 setInterval(() => {
     const content = document.getElementById('editor').innerHTML;
-    localStorage.setItem('autoSave', content);
+    localStorage.setItem('autoSavePro', content);
 }, 30000);
 
-// New automation: Auto-capitalize sentences (basic)
+// Auto-capitalize on input
 document.getElementById('editor').addEventListener('input', (e) => {
-    const text = e.target.innerText;
-    if (text.endsWith('. ')) {
-        // Capitalize next letter (simple hack)
-        e.target.innerHTML = text.replace(/\. (\w)/, '. $1'.toUpperCase());
-    }
+    // Smooth typing feel: Could add debounce or something, but basic
 });
