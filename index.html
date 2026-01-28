@@ -2,171 +2,153 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Intel Motion Studio</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Iran Strike Analysis Visualizer</title>
     
-    <!-- Leaflet for map rendering (CORS-safe, free, public) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Mapbox GL JS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    
+    <!-- Turf.js for geospatial calculations -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
-    
-    <!-- LOADING SEQUENCE -->
-    <div id="loading-screen" class="loading-screen active">
+    <!-- Loading Screen -->
+    <div id="loading-screen">
         <div class="loading-content">
-            <div class="loading-logo">
-                <svg width="60" height="60" viewBox="0 0 60 60">
-                    <circle cx="30" cy="30" r="28" fill="none" stroke="rgba(0,255,200,0.3)" stroke-width="2"/>
-                    <circle cx="30" cy="30" r="20" fill="none" stroke="rgba(0,255,200,0.6)" stroke-width="1.5"/>
-                    <circle cx="30" cy="30" r="12" fill="rgba(0,255,200,0.8)"/>
-                </svg>
+            <div class="loading-spinner"></div>
+            <p>Initializing Analysis System...</p>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Tactical Overlay -->
+    <div id="tactical-overlay">
+        <div class="grid-lines"></div>
+        <div class="scan-effect"></div>
+    </div>
+
+    <!-- Header HUD -->
+    <header id="main-header">
+        <div class="header-content">
+            <h1>Iran Strike Analysis</h1>
+            <p class="subtitle">U.S. Force Positioning & Operational Scenarios</p>
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span id="current-status">Monitoring Phase</span>
             </div>
-            <h1 class="loading-title">INTEL MOTION STUDIO</h1>
-            <div class="loading-stages">
-                <div class="stage" data-stage="0">
-                    <span class="stage-icon">◆</span>
-                    <span class="stage-text">Initialising renderer</span>
-                </div>
-                <div class="stage" data-stage="1">
-                    <span class="stage-icon">◆</span>
-                    <span class="stage-text">Loading base map</span>
-                </div>
-                <div class="stage" data-stage="2">
-                    <span class="stage-icon">◆</span>
-                    <span class="stage-text">Fetching public data</span>
-                </div>
-                <div class="stage" data-stage="3">
-                    <span class="stage-icon">◆</span>
-                    <span class="stage-text">Preparing timeline</span>
-                </div>
-                <div class="stage" data-stage="4">
-                    <span class="stage-icon">◆</span>
-                    <span class="stage-text">Ready</span>
-                </div>
+        </div>
+    </header>
+
+    <!-- Control Panel -->
+    <div id="control-panel">
+        <div class="control-section">
+            <h3>Visualization Layers</h3>
+            <div class="toggle-group">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-forces" checked>
+                    <span class="slider"></span>
+                    <span class="label">U.S. Forces</span>
+                </label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-allies" checked>
+                    <span class="slider"></span>
+                    <span class="label">Allied Positions</span>
+                </label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-targets">
+                    <span class="slider"></span>
+                    <span class="label">Strategic Sites</span>
+                </label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-ranges">
+                    <span class="slider"></span>
+                    <span class="label">Strike Ranges</span>
+                </label>
             </div>
-            <div class="loading-notice">
-                <p>Public data only • Delayed feeds • Educational use</p>
+        </div>
+
+        <div class="control-section">
+            <h3>Scenario Selection</h3>
+            <div id="scenario-buttons"></div>
+        </div>
+
+        <div class="control-section">
+            <h3>Auto-Play Presentation</h3>
+            <button id="autoplay-btn" class="primary-btn">
+                <span class="btn-icon">▶</span>
+                Start Presentation
+            </button>
+        </div>
+    </div>
+
+    <!-- Timeline Controller -->
+    <div id="timeline-controller">
+        <div class="timeline-header">
+            <h4>Operational Timeline</h4>
+            <span id="timeline-date">January 2025 - Present</span>
+        </div>
+        <div class="timeline-track">
+            <input type="range" id="timeline-slider" min="0" max="100" value="0" step="1">
+            <div id="timeline-markers"></div>
+        </div>
+        <div class="timeline-labels">
+            <span class="timeline-label">Rising Tensions</span>
+            <span class="timeline-label">Force Deployment</span>
+            <span class="timeline-label">Warning Phase</span>
+            <span class="timeline-label">Current Position</span>
+        </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div id="info-panel" class="hidden">
+        <button class="close-btn" id="close-info">×</button>
+        <div id="info-content"></div>
+    </div>
+
+    <!-- Legend -->
+    <div id="legend">
+        <h4>Legend</h4>
+        <div class="legend-items">
+            <div class="legend-item">
+                <span class="legend-icon carrier"></span>
+                <span>Carrier Strike Group</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon destroyer"></span>
+                <span>Destroyer / Cruiser</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon airbase"></span>
+                <span>U.S. Airbase</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon allied"></span>
+                <span>Allied Facility</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon target"></span>
+                <span>Strategic Site</span>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APPLICATION -->
-    <div id="app" class="app">
-        
-        <!-- MAP CONTAINER -->
-        <div id="map" class="map-container"></div>
+    <!-- Mobile Toggle Button -->
+    <button id="mobile-menu-toggle" class="mobile-only">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
 
-        <!-- OVERLAY LAYERS INDICATOR -->
-        <div class="overlay-indicator" id="overlay-indicator">
-            <div class="overlay-tag">PUBLIC DATA</div>
-            <div class="overlay-status" id="overlay-status"></div>
-        </div>
-
-        <!-- CAPTION OVERLAY (for animation sequences) -->
-        <div class="caption-overlay" id="caption-overlay">
-            <p id="caption-text"></p>
-        </div>
-
-        <!-- WATERMARK (shown in capture mode) -->
-        <div class="watermark" id="watermark">
-            INTEL MOTION STUDIO
-        </div>
-
-        <!-- CONTROL PANEL (hidden in capture mode) -->
-        <div class="control-panel" id="control-panel">
-            
-            <!-- Header -->
-            <div class="panel-header">
-                <h2>Intel Motion Studio</h2>
-                <button class="btn-minimize" id="btn-minimize">−</button>
-            </div>
-
-            <!-- Tabs -->
-            <div class="panel-tabs">
-                <button class="tab-btn active" data-tab="news">News</button>
-                <button class="tab-btn" data-tab="timeline">Timeline</button>
-                <button class="tab-btn" data-tab="layers">Layers</button>
-            </div>
-
-            <!-- NEWS TAB -->
-            <div class="tab-content active" data-tab-content="news">
-                <div class="news-feed" id="news-feed">
-                    <div class="news-loading">Loading news feeds...</div>
-                </div>
-            </div>
-
-            <!-- TIMELINE TAB -->
-            <div class="tab-content" data-tab-content="timeline">
-                <div class="timeline-controls">
-                    <button class="btn-icon" id="btn-play">▶</button>
-                    <button class="btn-icon" id="btn-pause">❚❚</button>
-                    <button class="btn-icon" id="btn-restart">↻</button>
-                </div>
-                <div class="timeline-bar" id="timeline-bar">
-                    <div class="timeline-progress" id="timeline-progress"></div>
-                    <div class="timeline-scenes" id="timeline-scenes"></div>
-                </div>
-                <div class="scene-editor" id="scene-editor">
-                    <p class="hint">Click a scene block to edit</p>
-                </div>
-            </div>
-
-            <!-- LAYERS TAB -->
-            <div class="tab-content" data-tab-content="layers">
-                <div class="layer-controls">
-                    <label class="layer-toggle">
-                        <input type="checkbox" id="layer-seismic" checked>
-                        <span>Seismic Activity (USGS)</span>
-                        <small>Public feed, 15min delay</small>
-                    </label>
-                    <label class="layer-toggle">
-                        <input type="checkbox" id="layer-aviation">
-                        <span>Aviation Density</span>
-                        <small>Aggregated public data</small>
-                    </label>
-                    <label class="layer-toggle">
-                        <input type="checkbox" id="layer-regions" checked>
-                        <span>Region Highlights</span>
-                        <small>Predefined areas of interest</small>
-                    </label>
-                </div>
-                <div class="layer-notice">
-                    <p>⚠️ All data is public, delayed, or aggregated.</p>
-                    <p>No real-time military tracking.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- FLOATING CONTROLS (always visible) -->
-        <div class="floating-controls" id="floating-controls">
-            <button class="btn-float" id="btn-capture" title="Capture Mode">
-                <svg width="20" height="20" viewBox="0 0 20 20">
-                    <rect x="2" y="2" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <circle cx="10" cy="10" r="3" fill="currentColor"/>
-                </svg>
-            </button>
-            <button class="btn-float" id="btn-regions" title="Quick Regions">
-                <svg width="20" height="20" viewBox="0 0 20 20">
-                    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
-                    <path d="M10 2 Q15 10 10 18 Q5 10 10 2" fill="none" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-            </button>
-        </div>
-
-        <!-- QUICK REGIONS MENU -->
-        <div class="quick-regions" id="quick-regions">
-            <button class="region-btn" data-region="global">Global</button>
-            <button class="region-btn" data-region="middle_east">Middle East</button>
-            <button class="region-btn" data-region="eastern_med">E. Med</button>
-            <button class="region-btn" data-region="europe">Europe</button>
-            <button class="region-btn" data-region="uk">UK</button>
-            <button class="region-btn" data-region="balkans">Balkans</button>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
+    <!-- Scripts -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
