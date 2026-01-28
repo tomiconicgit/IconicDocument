@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ally-qatar",
+    "name": "Al Udeid Air Base",
+    "country": "Qatar",
+    "type": "Air Base",
+    "coordinates": [51.315, 25.117],
+    "description": "Major U.S. ally hosting largest American air base in region. Critical staging point.",
+    "role": "Primary air operations hub"
+  },
+  {
+    "id": "ally-uae",
+    "name": "UAE Naval Facility",
+    "country": "United Arab Emirates",
+    "type": "Naval Port",
+    "coordinates": [54.37, 24.48],
+    "description": "Strategic port providing logistics and support for naval operations.",
+    "role": "Naval support and resupply"
+  },
+  {
+    "id": "ally-kuwait",
+    "name": "Ali Al Salem AB",
+    "country": "Kuwait",
+    "type": "Air Base",
+    "coordinates": [47.521, 29.347],
+    "description": "Northern staging base for tactical operations.",
+    "role": "Tactical air support"
+  },
+  {
+    "id": "ally-saudi",
+    "name": "Prince Sultan AB",
+    "country": "Saudi Arabia",
+    "type": "Air Base",
+    "coordinates": [47.583, 24.063],
+    "description": "Saudi facility hosting U.S. forces for regional operations.",
+    "role": "Deep strike capability"
+  },
+  {
+    "id": "ally-bahrain",
+    "name": "NSA Bahrain",
+    "country": "Bahrain",
+    "type": "Naval Base",
+    "coordinates": [50.609, 26.183],
+    "description": "Naval Support Activity Bahrain - home of U.S. Fifth Fleet.",
+    "role": "Naval command & control"
+  },
+  {
+    "id": "ally-oman",
+    "name": "Muscat Cooperation",
+    "country": "Oman",
+    "type": "Diplomatic",
+    "coordinates": [58.593, 23.614],
+    "description": "Strategic access and overflight permissions.",
+    "role": "Access and logistics"
+  }
+]
