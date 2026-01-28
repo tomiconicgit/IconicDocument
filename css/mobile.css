@@ -1,0 +1,198 @@
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   iPhone Safari Specific
+   ======================================== */
+
+@media (max-width: 768px) {
+    
+    /* Header adjustments */
+    #main-header {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+    
+    .header-content h1 {
+        font-size: 16px;
+    }
+    
+    .subtitle {
+        font-size: 11px;
+    }
+    
+    /* Hide desktop control panel */
+    #control-panel {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        border: none;
+        border-left: 1px solid var(--color-border);
+        transition: right var(--transition-medium);
+        z-index: 200;
+    }
+    
+    #control-panel.mobile-open {
+        right: 0;
+    }
+    
+    /* Show mobile menu toggle */
+    #mobile-menu-toggle {
+        display: flex;
+    }
+    
+    #mobile-menu-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+    
+    #mobile-menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+    }
+    
+    #mobile-menu-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+    }
+    
+    /* Legend positioning */
+    #legend {
+        top: auto;
+        bottom: 160px;
+        left: var(--spacing-md);
+        max-width: calc(100% - 100px);
+    }
+    
+    /* Info panel */
+    #info-panel {
+        left: var(--spacing-sm);
+        right: var(--spacing-sm);
+        width: auto;
+        bottom: 140px;
+    }
+    
+    /* Timeline controller */
+    #timeline-controller {
+        width: calc(100% - 16px);
+        bottom: var(--spacing-sm);
+    }
+    
+    .timeline-labels {
+        font-size: 9px;
+    }
+    
+    .timeline-label {
+        writing-mode: horizontal-tb;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+}
+
+@media (max-width: 480px) {
+    
+    /* Extra small screens */
+    .header-content h1 {
+        font-size: 14px;
+    }
+    
+    .timeline-labels {
+        display: none;
+    }
+    
+    #legend {
+        font-size: 11px;
+    }
+    
+    .legend-item {
+        font-size: 11px;
+        gap: var(--spacing-sm);
+    }
+    
+    .scenario-btn {
+        padding: var(--spacing-sm);
+    }
+    
+}
+
+/* ========================================
+   TOUCH OPTIMIZATIONS
+   ======================================== */
+
+@media (hover: none) and (pointer: coarse) {
+    
+    /* Increase touch targets */
+    .toggle-switch,
+    .scenario-btn,
+    .primary-btn,
+    .close-btn {
+        min-height: 44px;
+    }
+    
+    /* Remove hover effects */
+    .toggle-switch:hover,
+    .scenario-btn:hover,
+    .primary-btn:hover {
+        transform: none;
+    }
+    
+    /* Tap feedback */
+    .toggle-switch:active,
+    .scenario-btn:active,
+    .primary-btn:active {
+        opacity: 0.7;
+    }
+    
+}
+
+/* ========================================
+   SAFE AREA INSETS (iPhone Notch)
+   ======================================== */
+
+@supports (padding: max(0px)) {
+    
+    #main-header {
+        padding-top: max(var(--spacing-md), env(safe-area-inset-top));
+    }
+    
+    #timeline-controller {
+        padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+    }
+    
+    #mobile-menu-toggle {
+        bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+        right: max(var(--spacing-md), env(safe-area-inset-right));
+    }
+    
+}
+
+/* ========================================
+   LANDSCAPE MODE
+   ======================================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    
+    #main-header {
+        padding: var(--spacing-xs) var(--spacing-md);
+    }
+    
+    .header-content h1 {
+        font-size: 14px;
+    }
+    
+    .subtitle,
+    .status-indicator {
+        display: none;
+    }
+    
+    #legend {
+        max-width: 200px;
+        font-size: 10px;
+    }
+    
+    #timeline-controller {
+        padding: var(--spacing-sm);
+    }
+    
+}
