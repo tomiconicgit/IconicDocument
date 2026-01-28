@@ -1,0 +1,145 @@
+{
+  "lastUpdated": "2025-01-28",
+  "carriers": [
+    {
+      "id": "cvn-69",
+      "name": "USS Dwight D. Eisenhower",
+      "type": "Carrier Strike Group",
+      "coordinates": [59.5, 25.3],
+      "location": "Arabian Sea",
+      "status": "Deployed - Combat Ready",
+      "description": "Nimitz-class aircraft carrier deployed to the region following increased tensions. Operating with full air wing capable of strike operations.",
+      "capabilities": [
+        "90+ aircraft",
+        "F/A-18 Super Hornets",
+        "EA-18G Growlers",
+        "E-2D Hawkeyes",
+        "Long-range strike capability"
+      ],
+      "lastUpdate": "January 28, 2025",
+      "range": 800
+    },
+    {
+      "id": "cvn-72",
+      "name": "USS Abraham Lincoln",
+      "type": "Carrier Strike Group",
+      "coordinates": [56.2, 24.8],
+      "location": "Gulf of Oman",
+      "status": "Deployed - High Alert",
+      "description": "Second carrier strike group positioned to support potential operations. Provides redundancy and overwhelming force projection.",
+      "capabilities": [
+        "90+ aircraft",
+        "Multi-role fighters",
+        "Electronic warfare",
+        "ISR platforms",
+        "Sustained operations"
+      ],
+      "lastUpdate": "January 27, 2025",
+      "range": 800
+    }
+  ],
+  "escorts": [
+    {
+      "id": "ddg-89",
+      "name": "USS Mustin",
+      "type": "Arleigh Burke-class Destroyer",
+      "coordinates": [59.8, 25.1],
+      "location": "Arabian Sea - Eisenhower Group",
+      "status": "Active",
+      "description": "Aegis-equipped destroyer providing air defense and strike capabilities.",
+      "capabilities": [
+        "Tomahawk cruise missiles",
+        "SM-6 air defense",
+        "BMD capable",
+        "ASW warfare"
+      ],
+      "lastUpdate": "January 28, 2025"
+    },
+    {
+      "id": "cg-63",
+      "name": "USS Cowpens",
+      "type": "Ticonderoga-class Cruiser",
+      "coordinates": [59.3, 25.5],
+      "location": "Arabian Sea - Eisenhower Group",
+      "status": "Active",
+      "description": "Guided missile cruiser with advanced command and control.",
+      "capabilities": [
+        "122 VLS cells",
+        "Tomahawk strikes",
+        "Air defense command",
+        "BMD operations"
+      ],
+      "lastUpdate": "January 28, 2025"
+    },
+    {
+      "id": "ddg-112",
+      "name": "USS Michael Murphy",
+      "type": "Arleigh Burke-class Destroyer",
+      "coordinates": [56.4, 24.6],
+      "location": "Gulf of Oman - Lincoln Group",
+      "status": "Active",
+      "description": "Multi-mission destroyer supporting carrier operations.",
+      "capabilities": [
+        "Tomahawk cruise missiles",
+        "Air defense",
+        "Surface warfare",
+        "Strike coordination"
+      ],
+      "lastUpdate": "January 27, 2025"
+    }
+  ],
+  "airbases": [
+    {
+      "id": "al-udeid",
+      "name": "Al Udeid Air Base",
+      "type": "U.S. Air Force Base",
+      "coordinates": [51.315, 25.117],
+      "location": "Qatar",
+      "status": "Operational - Increased Activity",
+      "description": "Largest U.S. air base in Middle East. Home to B-52 bombers, F-22 Raptors, and extensive support aircraft.",
+      "capabilities": [
+        "B-52 strategic bombers",
+        "F-22 air superiority",
+        "Tanker support",
+        "ISR operations",
+        "CENTCOM forward HQ"
+      ],
+      "lastUpdate": "January 28, 2025",
+      "range": 3500
+    },
+    {
+      "id": "ali-al-salem",
+      "name": "Ali Al Salem Air Base",
+      "type": "U.S. Air Force Base",
+      "coordinates": [47.521, 29.347],
+      "location": "Kuwait",
+      "status": "Operational",
+      "description": "Strategic location for northern operations. Hosts fighter and support aircraft.",
+      "capabilities": [
+        "F-15E Strike Eagles",
+        "Close air support",
+        "Tactical airlift",
+        "Rapid response"
+      ],
+      "lastUpdate": "January 26, 2025",
+      "range": 2800
+    },
+    {
+      "id": "prince-sultan",
+      "name": "Prince Sultan Air Base",
+      "type": "U.S. Air Force Base",
+      "coordinates": [47.583, 24.063],
+      "location": "Saudi Arabia",
+      "status": "Operational - Enhanced Readiness",
+      "description": "Recently expanded U.S. presence. Strategic location for deep strike operations.",
+      "capabilities": [
+        "F-16 fighters",
+        "Bomber support",
+        "Air refueling",
+        "Command & control"
+      ],
+      "lastUpdate": "January 25, 2025",
+      "range": 3000
+    }
+  ]
+}
