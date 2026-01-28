@@ -1,0 +1,49 @@
+{
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Rising Tensions",
+      "date": "December 2024",
+      "description": "IRGC provocations in Strait of Hormuz. Increased harassment of shipping.",
+      "events": [
+        "Iranian fast-attack boats approach U.S. vessels",
+        "Drone incursions over Gulf waters",
+        "Rhetoric from IRGC commanders"
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Force Deployment Begins",
+      "date": "Early January 2025",
+      "description": "USS Eisenhower redirected to region. B-52 bombers deployed to Al Udeid.",
+      "events": [
+        "Carrier strike group deployment order",
+        "Strategic bomber forward positioning",
+        "Intelligence assets activated"
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Warning Phase",
+      "date": "Mid-January 2025",
+      "description": "President Trump issues stern warnings. Second carrier group (Lincoln) deployed.",
+      "events": [
+        "Presidential statement on consequences",
+        "USS Abraham Lincoln deployment",
+        "Regional allies briefed on contingencies"
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Current Position",
+      "date": "January 28, 2025",
+      "description": "Maximum force presence. All assets in position. Decision point approaching.",
+      "events": [
+        "Two carrier groups on station",
+        "100+ strike aircraft ready",
+        "Target packages prepared",
+        "Awaiting final authorization"
+      ]
+    }
+  ]
+}
