@@ -1,5 +1,5 @@
 /* ========================================
-   MOBILE OPTIMIZATIONS
+   MOBILE OPTIMIZATIONS - COMPLETE
    iPhone Safari Specific
    ======================================== */
 
@@ -18,7 +18,7 @@
         font-size: 11px;
     }
     
-    /* Hide desktop control panel */
+    /* Hide desktop control panel, make it slide in from right */
     #control-panel {
         position: fixed;
         top: 0;
@@ -32,10 +32,63 @@
         border-left: 1px solid var(--color-border);
         transition: right var(--transition-medium);
         z-index: 200;
+        padding-top: 60px;
     }
     
     #control-panel.mobile-open {
         right: 0;
+    }
+    
+    /* Add close button to mobile control panel */
+    #control-panel::before {
+        content: '×';
+        position: fixed;
+        top: var(--spacing-md);
+        right: var(--spacing-md);
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 74, 95, 0.2);
+        border: 1px solid rgba(255, 74, 95, 0.4);
+        border-radius: 50%;
+        color: var(--color-accent-red);
+        font-size: 32px;
+        line-height: 32px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 201;
+        transition: all var(--transition-fast);
+        font-weight: 300;
+    }
+    
+    #control-panel.mobile-open::before {
+        display: flex;
+    }
+    
+    #control-panel::before:active {
+        background: rgba(255, 74, 95, 0.4);
+        transform: scale(0.95);
+    }
+    
+    /* Backdrop for mobile menu */
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--transition-medium);
+        z-index: 199;
+    }
+    
+    body.menu-open::after {
+        opacity: 1;
+        pointer-events: all;
     }
     
     /* Show mobile menu toggle */
@@ -55,12 +108,37 @@
         transform: rotate(-45deg) translate(6px, -6px);
     }
     
-    /* Legend positioning */
+    /* Legend - make collapsible on mobile */
     #legend {
         top: auto;
-        bottom: 160px;
-        left: var(--spacing-md);
-        max-width: calc(100% - 100px);
+        bottom: 140px;
+        left: var(--spacing-sm);
+        max-width: 180px;
+        transition: all var(--transition-fast);
+    }
+    
+    #legend.collapsed {
+        height: 44px;
+        overflow: hidden;
+    }
+    
+    #legend h4 {
+        cursor: pointer;
+        position: relative;
+        user-select: none;
+        padding-right: 20px;
+    }
+    
+    #legend h4::after {
+        content: '▼';
+        position: absolute;
+        right: 0;
+        font-size: 10px;
+        transition: transform var(--transition-fast);
+    }
+    
+    #legend.collapsed h4::after {
+        transform: rotate(-90deg);
     }
     
     /* Info panel */
@@ -69,6 +147,7 @@
         right: var(--spacing-sm);
         width: auto;
         bottom: 140px;
+        max-height: 300px;
     }
     
     /* Timeline controller */
@@ -103,15 +182,29 @@
     
     #legend {
         font-size: 11px;
+        max-width: 150px;
     }
     
     .legend-item {
-        font-size: 11px;
-        gap: var(--spacing-sm);
+        font-size: 10px;
+        gap: var(--spacing-xs);
+    }
+    
+    .legend-icon {
+        width: 16px;
+        height: 16px;
     }
     
     .scenario-btn {
         padding: var(--spacing-sm);
+    }
+    
+    .scenario-btn-title {
+        font-size: 13px;
+    }
+    
+    .scenario-btn-desc {
+        font-size: 10px;
     }
     
 }
@@ -130,11 +223,16 @@
         min-height: 44px;
     }
     
-    /* Remove hover effects */
+    /* Remove hover effects on touch devices */
     .toggle-switch:hover,
     .scenario-btn:hover,
     .primary-btn:hover {
         transform: none;
+        background: rgba(74, 158, 255, 0.1);
+    }
+    
+    .scenario-btn:hover {
+        background: rgba(74, 158, 255, 0.1);
     }
     
     /* Tap feedback */
@@ -144,10 +242,15 @@
         opacity: 0.7;
     }
     
+    /* Better touch scrolling */
+    #control-panel {
+        -webkit-overflow-scrolling: touch;
+    }
+    
 }
 
 /* ========================================
-   SAFE AREA INSETS (iPhone Notch)
+   SAFE AREA INSETS (iPhone Notch/Dynamic Island)
    ======================================== */
 
 @supports (padding: max(0px)) {
@@ -158,11 +261,23 @@
     
     #timeline-controller {
         padding-bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+        bottom: max(var(--spacing-sm), env(safe-area-inset-bottom));
     }
     
     #mobile-menu-toggle {
-        bottom: max(var(--spacing-md), env(safe-area-inset-bottom));
+        bottom: max(70px, calc(70px + env(safe-area-inset-bottom)));
         right: max(var(--spacing-md), env(safe-area-inset-right));
+    }
+    
+    #legend {
+        bottom: max(140px, calc(140px + env(safe-area-inset-bottom)));
+        left: max(var(--spacing-sm), env(safe-area-inset-left));
+    }
+    
+    #info-panel {
+        bottom: max(140px, calc(140px + env(safe-area-inset-bottom)));
+        left: max(var(--spacing-sm), env(safe-area-inset-left));
+        right: max(var(--spacing-sm), env(safe-area-inset-right));
     }
     
 }
@@ -187,12 +302,189 @@
     }
     
     #legend {
-        max-width: 200px;
+        max-width: 140px;
+        font-size: 9px;
+        bottom: 80px;
+    }
+    
+    #legend h4 {
+        font-size: 11px;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .legend-item {
+        font-size: 9px;
+        gap: var(--spacing-xs);
+    }
+    
+    .legend-icon {
+        width: 14px;
+        height: 14px;
+    }
+    
+    #timeline-controller {
+        padding: var(--spacing-sm);
+        max-width: 600px;
+    }
+    
+    .timeline-header h4 {
+        font-size: 11px;
+    }
+    
+    #timeline-date {
         font-size: 10px;
+    }
+    
+    #info-panel {
+        max-height: 200px;
+        bottom: 80px;
+        max-width: 300px;
+    }
+    
+    #control-panel {
+        width: 80%;
+        max-width: 400px;
+        right: -80%;
+    }
+    
+}
+
+/* ========================================
+   EXTRA SMALL LANDSCAPE (iPhone SE, etc)
+   ======================================== */
+
+@media (max-width: 667px) and (orientation: landscape) {
+    
+    #main-header {
+        padding: 4px var(--spacing-sm);
+    }
+    
+    .header-content h1 {
+        font-size: 12px;
+    }
+    
+    .subtitle {
+        font-size: 9px;
+    }
+    
+    #legend {
+        bottom: 60px;
+        padding: var(--spacing-sm);
+    }
+    
+    #timeline-controller {
+        bottom: 4px;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    #mobile-menu-toggle {
+        width: 40px;
+        height: 40px;
+        bottom: 60px;
+    }
+    
+    #mobile-menu-toggle span {
+        width: 16px;
+    }
+    
+}
+
+/* ========================================
+   PORTRAIT MODE SPECIFIC
+   ======================================== */
+
+@media (max-width: 768px) and (orientation: portrait) {
+    
+    /* Give more space to map in portrait */
+    #legend {
+        bottom: 160px;
+    }
+    
+    #info-panel {
+        bottom: 160px;
+    }
+    
+}
+
+/* ========================================
+   IPHONE MINI (iPhone 12/13 mini)
+   ======================================== */
+
+@media (max-width: 375px) {
+    
+    #legend {
+        max-width: 140px;
+        font-size: 10px;
+        padding: var(--spacing-sm);
+    }
+    
+    #legend h4 {
+        font-size: 11px;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .legend-item {
+        font-size: 9px;
     }
     
     #timeline-controller {
         padding: var(--spacing-sm);
     }
     
+    .timeline-header h4 {
+        font-size: 11px;
+    }
+    
+    #control-panel {
+        padding: var(--spacing-md);
+    }
+    
+    .control-section h3 {
+        font-size: 12px;
+    }
+    
+}
+
+/* ========================================
+   PREVENT ZOOM ON INPUT FOCUS (iOS)
+   ======================================== */
+
+@media (max-width: 768px) {
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* ========================================
+   DISABLE PULL-TO-REFRESH (iOS Safari)
+   ======================================== */
+
+@media (max-width: 768px) {
+    body {
+        overscroll-behavior-y: none;
+    }
+}
+
+/* ========================================
+   IMPROVE MAP CONTROLS ON MOBILE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .mapboxgl-ctrl-group {
+        margin-bottom: 80px !important;
+        margin-right: 8px !important;
+    }
+    
+    .mapboxgl-ctrl-group button {
+        width: 36px !important;
+        height: 36px !important;
+    }
+    
+    .mapboxgl-ctrl-zoom-in,
+    .mapboxgl-ctrl-zoom-out,
+    .mapboxgl-ctrl-compass {
+        font-size: 18px !important;
+    }
 }
