@@ -1,0 +1,170 @@
+[
+  {
+    "id": "scenario-1",
+    "name": "Force Posturing & Deterrence",
+    "description": "Current deployment demonstrating U.S. readiness and regional commitment",
+    "camera": {
+      "center": [56.0, 26.0],
+      "zoom": 5.5,
+      "pitch": 50,
+      "bearing": 0
+    },
+    "zones": [
+      {
+        "center": [54.0, 27.0],
+        "radius": 300000,
+        "color": "rgba(74, 158, 255, 0.08)",
+        "borderColor": "rgba(74, 158, 255, 0.3)",
+        "label": "Strike Range - Carrier Groups"
+      }
+    ],
+    "movements": [
+      {
+        "path": [[65.0, 23.0], [59.5, 25.3]],
+        "color": "#4a9eff",
+        "label": "USS Eisenhower Deployment Path"
+      }
+    ]
+  },
+  {
+    "id": "scenario-2",
+    "name": "Limited Precision Strike",
+    "description": "Analysts discuss potential for targeted operations against IRGC command infrastructure",
+    "camera": {
+      "center": [51.5, 34.0],
+      "zoom": 6.5,
+      "pitch": 60,
+      "bearing": -20
+    },
+    "strikePaths": [
+      {
+        "origin": [51.315, 25.117],
+        "target": [51.4215, 35.6892],
+        "color": "#ff4a5f",
+        "height": 0.6,
+        "label": "Potential B-52 Route - IRGC HQ"
+      },
+      {
+        "origin": [59.5, 25.3],
+        "target": [51.7295, 33.7247],
+        "color": "#ff6b7f",
+        "height": 0.5,
+        "label": "Carrier Strike - Natanz Facility"
+      },
+      {
+        "origin": [47.521, 29.347],
+        "target": [51.7833, 35.5167],
+        "color": "#ff8a9f",
+        "height": 0.4,
+        "label": "F-15E Route - Parchin Complex"
+      }
+    ],
+    "zones": [
+      {
+        "center": [51.4215, 35.6892],
+        "radius": 50000,
+        "color": "rgba(255, 74, 95, 0.15)",
+        "borderColor": "rgba(255, 74, 95, 0.4)",
+        "label": "Command & Control Zone"
+      }
+    ]
+  },
+  {
+    "id": "scenario-3",
+    "name": "Comprehensive Liberation Campaign",
+    "description": "Multi-phase operation to eliminate IRGC capabilities and support Iranian freedom",
+    "camera": {
+      "center": [52.0, 32.5],
+      "zoom": 5.8,
+      "pitch": 55,
+      "bearing": 15
+    },
+    "strikePaths": [
+      {
+        "origin": [51.315, 25.117],
+        "target": [51.7295, 33.7247],
+        "color": "#ff4a5f",
+        "height": 0.7,
+        "label": "Phase 1 - Nuclear Infrastructure"
+      },
+      {
+        "origin": [51.315, 25.117],
+        "target": [50.9881, 34.9517],
+        "color": "#ff4a5f",
+        "height": 0.7,
+        "label": "Phase 1 - Fordow Site"
+      },
+      {
+        "origin": [59.5, 25.3],
+        "target": [51.4215, 35.6892],
+        "color": "#ff6b7f",
+        "height": 0.6,
+        "label": "Phase 2 - IRGC Command"
+      },
+      {
+        "origin": [47.521, 29.347],
+        "target": [51.7833, 35.5167],
+        "color": "#ff8a9f",
+        "height": 0.5,
+        "label": "Phase 2 - Military Infrastructure"
+      }
+    ],
+    "zones": [
+      {
+        "center": [51.5, 33.0],
+        "radius": 400000,
+        "color": "rgba(255, 74, 95, 0.1)",
+        "borderColor": "rgba(255, 74, 95, 0.3)",
+        "label": "Liberation Operation Zone"
+      },
+      {
+        "center": [51.4215, 35.6892],
+        "radius": 100000,
+        "color": "rgba(255, 74, 95, 0.2)",
+        "borderColor": "rgba(255, 74, 95, 0.5)",
+        "label": "Priority Target - Tehran"
+      }
+    ]
+  },
+  {
+    "id": "scenario-4",
+    "name": "Coalition Support & Regional Response",
+    "description": "Allied participation and regional cooperation in liberation efforts",
+    "camera": {
+      "center": [50.0, 28.0],
+      "zoom": 5.2,
+      "pitch": 45,
+      "bearing": -30
+    },
+    "zones": [
+      {
+        "center": [51.315, 25.117],
+        "radius": 200000,
+        "color": "rgba(74, 255, 136, 0.1)",
+        "borderColor": "rgba(74, 255, 136, 0.3)",
+        "label": "Coalition Air Operations - Qatar"
+      },
+      {
+        "center": [47.521, 29.347],
+        "radius": 180000,
+        "color": "rgba(74, 255, 136, 0.1)",
+        "borderColor": "rgba(74, 255, 136, 0.3)",
+        "label": "Coalition Support - Kuwait"
+      },
+      {
+        "center": [47.583, 24.063],
+        "radius": 220000,
+        "color": "rgba(74, 255, 136, 0.1)",
+        "borderColor": "rgba(74, 255, 136, 0.3)",
+        "label": "Coalition Operations - Saudi Arabia"
+      }
+    ],
+    "movements": [
+      {
+        "path": [[35.5, 33.3], [51.315, 25.117]],
+        "color": "#4aff88",
+        "label": "Allied Reinforcement Route"
+      }
+    ]
+  }
+]
