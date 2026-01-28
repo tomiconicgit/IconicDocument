@@ -10,42 +10,101 @@ export class MapEngine {
         this.markers = new Map();
         this.layers = new Map();
         
-        // Mapbox access token (free tier - replace with your own)
-        mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZSIsImEiOiJjbGV4YW1wbGUifQ.example';
+        // Use free Mapbox token - REPLACE WITH YOUR OWN
+        // Get free token at: https://account.mapbox.com/access-tokens/
+        mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXVzZXIiLCJhIjoiY2t4eHh4eHh4eHh4In0.example_token_replace_me';
     }
     
     init() {
-        this.map = new mapboxgl.Map({
-            container: this.containerId,
-            style: 'mapbox://styles/mapbox/dark-v11',
-            center: [54.0, 27.0], // Persian Gulf
-            zoom: 5,
-            pitch: 45,
-            bearing: 0,
-            antialias: true
-        });
+        // Set loading background
+        document.getElementById(this.containerId).style.backgroundColor = '#0a1929';
         
-        this.map.on('load', () => {
-            this.onMapLoad();
-        });
-        
-        // Add navigation controls
-        this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        try {
+            this.map = new mapboxgl.Map({
+                container: this.containerId,
+                style: 'mapbox://styles/mapbox/dark-v11',
+                center: [54.0, 27.0], // Persian Gulf
+                zoom: 4.5,
+                pitch: 0,
+                bearing: 0,
+                antialias: true,
+                attributionControl: false
+            });
+            
+            this.map.on('load', () => {
+                this.onMapLoad();
+            });
+            
+            this.map.on('error', (e) => {
+                console.error('Mapbox error:', e);
+                this.showMapError();
+            });
+            
+            // Add navigation controls
+            this.map.addControl(new mapboxgl.NavigationControl({
+                showCompass: true,
+                showZoom: true,
+                visualizePitch: true
+            }), 'bottom-right');
+            
+            // Add scale
+            this.map.addControl(new mapboxgl.ScaleControl({
+                maxWidth: 100,
+                unit: 'metric'
+            }));
+            
+        } catch (error) {
+            console.error('Failed to initialize map:', error);
+            this.showMapError();
+        }
+    }
+    
+    showMapError() {
+        const container = document.getElementById(this.containerId);
+        container.innerHTML = `
+            <div style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                background: linear-gradient(135deg, #0a1929 0%, #1a2940 100%);
+                color: #fff;
+                flex-direction: column;
+                padding: 20px;
+                text-align: center;
+            ">
+                <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                <h2 style="margin-bottom: 10px; color: #4a9eff;">Map Loading Issue</h2>
+                <p style="color: #8a9bb5; max-width: 400px; line-height: 1.6;">
+                    Unable to load Mapbox map. Please:<br><br>
+                    1. Get a free token at <a href="https://account.mapbox.com" target="_blank" style="color: #4a9eff;">mapbox.com</a><br>
+                    2. Replace token in js/map-engine.js (line 14)<br>
+                    3. Refresh the page
+                </p>
+            </div>
+        `;
     }
     
     onMapLoad() {
         console.log('Map loaded successfully');
         
-        // Add custom styling
-        this.map.setPaintProperty('water', 'water-color', '#0a1929');
-        
-        // Enable 3D terrain (if available)
-        if (this.map.getSource('mapbox-dem')) {
-            this.map.setTerrain({ source: 'mapbox-dem', exaggeration: 1.5 });
+        // Style water
+        if (this.map.getLayer('water')) {
+            this.map.setPaintProperty('water', 'water-color', '#0a1929');
         }
+        
+        // Add atmosphere
+        this.map.setFog({
+            'color': 'rgb(186, 210, 235)',
+            'high-color': 'rgb(36, 92, 223)',
+            'horizon-blend': 0.02,
+            'space-color': 'rgb(11, 11, 25)',
+            'star-intensity': 0.6
+        });
     }
     
     flyTo(options) {
+        if (!this.map) return;
         this.map.flyTo({
             ...options,
             duration: 2000,
@@ -54,6 +113,8 @@ export class MapEngine {
     }
     
     addMarker({ id, coordinates, type, data, onClick }) {
+        if (!this.map) return;
+        
         // Create custom marker element
         const el = document.createElement('div');
         el.className = `custom-marker marker-${type}`;
@@ -82,7 +143,10 @@ export class MapEngine {
         
         // Click handler
         if (onClick) {
-            el.addEventListener('click', onClick);
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                onClick();
+            });
         }
         
         // Create and add marker
@@ -144,6 +208,8 @@ export class MapEngine {
     }
     
     addCircle({ id, center, radius, color, borderColor }) {
+        if (!this.map) return;
+        
         const circleGeoJSON = turf.circle(center, radius / 1000, {
             steps: 64,
             units: 'kilometers'
@@ -182,6 +248,8 @@ export class MapEngine {
     }
     
     addLine({ id, coordinates, color, width, animated }) {
+        if (!this.map) return;
+        
         this.map.addSource(id, {
             type: 'geojson',
             data: {
@@ -204,25 +272,12 @@ export class MapEngine {
             }
         });
         
-        if (animated) {
-            this.animateLine(id);
-        }
-        
         this.layers.set(id, { type: 'line', sourceId: id });
     }
     
-    animateLine(layerId) {
-        let offset = 0;
-        const animate = () => {
-            offset = (offset + 1) % 200;
-            this.map.setPaintProperty(layerId, 'line-dasharray', [0, 4, 3]);
-            this.map.setPaintProperty(layerId, 'line-gap-width', offset);
-            requestAnimationFrame(animate);
-        };
-        animate();
-    }
-    
     addArc({ id, start, end, color, height }) {
+        if (!this.map) return;
+        
         // Create curved arc using Turf.js
         const line = turf.lineString([start, end]);
         const bezier = turf.bezierSpline(line);
@@ -261,7 +316,7 @@ export class MapEngine {
     
     removeLayer(id) {
         const layer = this.layers.get(id);
-        if (layer) {
+        if (layer && this.map) {
             if (this.map.getLayer(id)) {
                 this.map.removeLayer(id);
             }
