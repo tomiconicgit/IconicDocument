@@ -1,0 +1,40 @@
+{
+  "regions": {
+    "middle_east": {
+      "name": "Middle East",
+      "center": [29.0, 47.0],
+      "zoom": 5,
+      "description": "Persian Gulf, Levant, Arabian Peninsula"
+    },
+    "uk": {
+      "name": "United Kingdom",
+      "center": [54.0, -2.5],
+      "zoom": 6,
+      "description": "British Isles"
+    },
+    "europe": {
+      "name": "Europe",
+      "center": [50.0, 10.0],
+      "zoom": 4,
+      "description": "Continental Europe"
+    },
+    "eastern_med": {
+      "name": "Eastern Mediterranean",
+      "center": [35.0, 28.0],
+      "zoom": 5,
+      "description": "Cyprus, Greece, Turkey, Levant"
+    },
+    "balkans": {
+      "name": "Balkans",
+      "center": [43.0, 20.0],
+      "zoom": 6,
+      "description": "Southeast Europe"
+    },
+    "global": {
+      "name": "Global View",
+      "center": [20.0, 0.0],
+      "zoom": 2,
+      "description": "World overview"
+    }
+  }
+}
