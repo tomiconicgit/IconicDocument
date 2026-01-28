@@ -2,106 +2,171 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#000000">
-    <title>MOTHER Terminal</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>Intel Motion Studio</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Leaflet for map rendering (CORS-safe, free, public) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-    <!-- Boot Sequence Overlay -->
-    <div id="boot-overlay" class="boot-overlay">
-        <div class="boot-content">
-            <div class="boot-logo">MOTHER</div>
-            <div class="boot-version">v7.3.0</div>
-            <div class="boot-status">INITIALIZING SYSTEMS...</div>
-            <div class="boot-progress">
-                <div class="boot-progress-bar"></div>
+    
+    <!-- LOADING SEQUENCE -->
+    <div id="loading-screen" class="loading-screen active">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg width="60" height="60" viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="28" fill="none" stroke="rgba(0,255,200,0.3)" stroke-width="2"/>
+                    <circle cx="30" cy="30" r="20" fill="none" stroke="rgba(0,255,200,0.6)" stroke-width="1.5"/>
+                    <circle cx="30" cy="30" r="12" fill="rgba(0,255,200,0.8)"/>
+                </svg>
+            </div>
+            <h1 class="loading-title">INTEL MOTION STUDIO</h1>
+            <div class="loading-stages">
+                <div class="stage" data-stage="0">
+                    <span class="stage-icon">◆</span>
+                    <span class="stage-text">Initialising renderer</span>
+                </div>
+                <div class="stage" data-stage="1">
+                    <span class="stage-icon">◆</span>
+                    <span class="stage-text">Loading base map</span>
+                </div>
+                <div class="stage" data-stage="2">
+                    <span class="stage-icon">◆</span>
+                    <span class="stage-text">Fetching public data</span>
+                </div>
+                <div class="stage" data-stage="3">
+                    <span class="stage-icon">◆</span>
+                    <span class="stage-text">Preparing timeline</span>
+                </div>
+                <div class="stage" data-stage="4">
+                    <span class="stage-icon">◆</span>
+                    <span class="stage-text">Ready</span>
+                </div>
+            </div>
+            <div class="loading-notice">
+                <p>Public data only • Delayed feeds • Educational use</p>
             </div>
         </div>
     </div>
 
-    <!-- Main Terminal Interface -->
-    <div id="terminal-container" class="terminal-container">
-        <!-- Scanline Effect -->
-        <div class="scanline"></div>
+    <!-- MAIN APPLICATION -->
+    <div id="app" class="app">
         
-        <!-- Terminal Header -->
-        <header class="terminal-header">
-            <div class="header-left">
-                <span class="status-indicator"></span>
-                <span class="header-title">MOTHER</span>
-            </div>
-            <div class="header-right">
-                <button id="sound-toggle" class="icon-btn" aria-label="Toggle Sound">
-                    <span class="sound-icon">🔊</span>
-                </button>
-                <button id="menu-toggle" class="icon-btn" aria-label="Menu">
-                    <span class="menu-icon">⋮</span>
-                </button>
-            </div>
-        </header>
+        <!-- MAP CONTAINER -->
+        <div id="map" class="map-container"></div>
 
-        <!-- Terminal Output -->
-        <div id="terminal-output" class="terminal-output"></div>
+        <!-- OVERLAY LAYERS INDICATOR -->
+        <div class="overlay-indicator" id="overlay-indicator">
+            <div class="overlay-tag">PUBLIC DATA</div>
+            <div class="overlay-status" id="overlay-status"></div>
+        </div>
 
-        <!-- Terminal Input Area -->
-        <div class="terminal-input-container">
-            <div class="input-wrapper">
-                <span class="prompt">></span>
-                <input 
-                    type="text" 
-                    id="terminal-input" 
-                    class="terminal-input" 
-                    autocomplete="off" 
-                    autocorrect="off" 
-                    autocapitalize="off" 
-                    spellcheck="false"
-                    placeholder="Enter command..."
-                >
+        <!-- CAPTION OVERLAY (for animation sequences) -->
+        <div class="caption-overlay" id="caption-overlay">
+            <p id="caption-text"></p>
+        </div>
+
+        <!-- WATERMARK (shown in capture mode) -->
+        <div class="watermark" id="watermark">
+            INTEL MOTION STUDIO
+        </div>
+
+        <!-- CONTROL PANEL (hidden in capture mode) -->
+        <div class="control-panel" id="control-panel">
+            
+            <!-- Header -->
+            <div class="panel-header">
+                <h2>Intel Motion Studio</h2>
+                <button class="btn-minimize" id="btn-minimize">−</button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="panel-tabs">
+                <button class="tab-btn active" data-tab="news">News</button>
+                <button class="tab-btn" data-tab="timeline">Timeline</button>
+                <button class="tab-btn" data-tab="layers">Layers</button>
+            </div>
+
+            <!-- NEWS TAB -->
+            <div class="tab-content active" data-tab-content="news">
+                <div class="news-feed" id="news-feed">
+                    <div class="news-loading">Loading news feeds...</div>
+                </div>
+            </div>
+
+            <!-- TIMELINE TAB -->
+            <div class="tab-content" data-tab-content="timeline">
+                <div class="timeline-controls">
+                    <button class="btn-icon" id="btn-play">▶</button>
+                    <button class="btn-icon" id="btn-pause">❚❚</button>
+                    <button class="btn-icon" id="btn-restart">↻</button>
+                </div>
+                <div class="timeline-bar" id="timeline-bar">
+                    <div class="timeline-progress" id="timeline-progress"></div>
+                    <div class="timeline-scenes" id="timeline-scenes"></div>
+                </div>
+                <div class="scene-editor" id="scene-editor">
+                    <p class="hint">Click a scene block to edit</p>
+                </div>
+            </div>
+
+            <!-- LAYERS TAB -->
+            <div class="tab-content" data-tab-content="layers">
+                <div class="layer-controls">
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-seismic" checked>
+                        <span>Seismic Activity (USGS)</span>
+                        <small>Public feed, 15min delay</small>
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-aviation">
+                        <span>Aviation Density</span>
+                        <small>Aggregated public data</small>
+                    </label>
+                    <label class="layer-toggle">
+                        <input type="checkbox" id="layer-regions" checked>
+                        <span>Region Highlights</span>
+                        <small>Predefined areas of interest</small>
+                    </label>
+                </div>
+                <div class="layer-notice">
+                    <p>⚠️ All data is public, delayed, or aggregated.</p>
+                    <p>No real-time military tracking.</p>
+                </div>
             </div>
         </div>
 
-        <!-- Quick Commands Panel -->
-        <div id="quick-commands" class="quick-commands">
-            <button class="cmd-btn" data-cmd="help">help</button>
-            <button class="cmd-btn" data-cmd="time">time</button>
-            <button class="cmd-btn" data-cmd="status">status</button>
-            <button class="cmd-btn" data-cmd="clear">clear</button>
+        <!-- FLOATING CONTROLS (always visible) -->
+        <div class="floating-controls" id="floating-controls">
+            <button class="btn-float" id="btn-capture" title="Capture Mode">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <rect x="2" y="2" width="16" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="10" cy="10" r="3" fill="currentColor"/>
+                </svg>
+            </button>
+            <button class="btn-float" id="btn-regions" title="Quick Regions">
+                <svg width="20" height="20" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M10 2 Q15 10 10 18 Q5 10 10 2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- QUICK REGIONS MENU -->
+        <div class="quick-regions" id="quick-regions">
+            <button class="region-btn" data-region="global">Global</button>
+            <button class="region-btn" data-region="middle_east">Middle East</button>
+            <button class="region-btn" data-region="eastern_med">E. Med</button>
+            <button class="region-btn" data-region="europe">Europe</button>
+            <button class="region-btn" data-region="uk">UK</button>
+            <button class="region-btn" data-region="balkans">Balkans</button>
         </div>
     </div>
 
-    <!-- Settings Panel (Hidden by default) -->
-    <div id="settings-panel" class="settings-panel hidden">
-        <div class="settings-content">
-            <h2>SETTINGS</h2>
-            <div class="setting-item">
-                <label>
-                    <input type="checkbox" id="sound-enabled" checked>
-                    <span>Audio Feedback</span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <label>
-                    <input type="checkbox" id="animations-enabled" checked>
-                    <span>Animations</span>
-                </label>
-            </div>
-            <div class="setting-item">
-                <label>
-                    <input type="checkbox" id="scanline-enabled" checked>
-                    <span>Scanline Effect</span>
-                </label>
-            </div>
-            <button id="close-settings" class="btn-primary">CLOSE</button>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script type="module" src="js/app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
