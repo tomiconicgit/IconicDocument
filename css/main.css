@@ -1,0 +1,158 @@
+/* ========================================
+   IRAN STRIKE ANALYSIS VISUALIZER
+   Main Stylesheet
+   ======================================== */
+
+:root {
+    /* Color Palette - Dark Military Theme */
+    --color-bg-primary: #0a0e1a;
+    --color-bg-secondary: #121826;
+    --color-bg-panel: rgba(18, 24, 38, 0.95);
+    --color-border: rgba(100, 180, 255, 0.3);
+    --color-text-primary: #e8edf4;
+    --color-text-secondary: #8a9bb5;
+    --color-accent-blue: #4a9eff;
+    --color-accent-red: #ff4a5f;
+    --color-accent-green: #4aff88;
+    --color-accent-yellow: #ffbb4a;
+    
+    /* Status Colors */
+    --color-us-forces: #4a9eff;
+    --color-allies: #4aff88;
+    --color-targets: #ff4a5f;
+    --color-range: rgba(74, 158, 255, 0.2);
+    
+    /* Typography */
+    --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --font-mono: 'Courier New', Courier, monospace;
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.4s ease;
+    --transition-slow: 0.8s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: pan-x pan-y;
+}
+
+/* ========================================
+   LOADING SCREEN
+   ======================================== */
+
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    transition: opacity var(--transition-medium);
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(74, 158, 255, 0.2);
+    border-top-color: var(--color-accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto var(--spacing-md);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-content p {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+/* ========================================
+   MAP CONTAINER
+   ======================================== */
+
+#map {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+}
+
+.mapboxgl-ctrl-logo,
+.mapboxgl-ctrl-attrib {
+    display: none !important;
+}
+
+/* ========================================
+   TACTICAL OVERLAY
+   ======================================== */
+
+#tactical-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.3;
+}
+
+.grid-lines {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(74, 158, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 158, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+.scan-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to bottom, 
+        transparent, 
+        rgba(74, 158, 255, 0.4), 
+        transparent);
+    animation: scan 4​​​​​​​​​​​​​​​​
