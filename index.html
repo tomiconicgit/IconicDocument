@@ -2,57 +2,266 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Insane Text Editor Pro</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> <!-- For PDF export -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0e1a">
+    <title>SkyWatch Radar - Live Flight Tracking</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://opensky-network.org">
+    <link rel="preconnect" href="https://unpkg.com">
+    
+    <!-- Leaflet for mapping -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="anonymous"/>
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="src/css/main.css">
+    <link rel="stylesheet" href="src/css/mobile.css">
 </head>
 <body>
-    <div id="toolbar">
-        <button class="tool-btn" onclick="execCmd('bold')"><b>B</b></button>
-        <button class="tool-btn" onclick="execCmd('italic')"><i>I</i></button>
-        <button class="tool-btn" onclick="execCmd('underline')"><u>U</u></button>
-        <button class="tool-btn" onclick="execCmd('strikeThrough')">S</button>
-        <button class="tool-btn" onclick="execCmd('insertUnorderedList')">•</button>
-        <button class="tool-btn" onclick="execCmd('insertOrderedList')">1.</button>
-        <button class="tool-btn" onclick="execCmd('justifyLeft')">←</button>
-        <button class="tool-btn" onclick="execCmd('justifyCenter')">↔</button>
-        <button class="tool-btn" onclick="execCmd('justifyRight')">→</button>
-        <button class="tool-btn" onclick="execCmd('justifyFull')">↕</button>
-        <select class="tool-select" onchange="execCmd('fontName', this.value)">
-            <option value="Arial">Arial</option>
-            <option value="Helvetica">Helvetica</option>
-            <option value="Times New Roman">Times</option>
-            <option value="Courier New">Courier</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Georgia">Georgia</option>
-        </select>
-        <select class="tool-select" onchange="execCmd('fontSize', this.value)">
-            <option value="1">Tiny</option>
-            <option value="2">Small</option>
-            <option value="3">Normal</option>
-            <option value="4">Medium</option>
-            <option value="5">Large</option>
-            <option value="6">X-Large</option>
-            <option value="7">Huge</option>
-        </select>
-        <label class="tool-label">Text Color: <input type="color" onchange="execCmd('foreColor', this.value)"></label>
-        <label class="tool-label">Highlight: <input type="color" onchange="execCmd('hiliteColor', this.value)"></label>
-        <button class="tool-btn" onclick="execCmd('undo')">↩️</button>
-        <button class="tool-btn" onclick="execCmd('redo')">↪️</button>
-        <button class="tool-btn" onclick="findReplace()">🔍</button>
-        <button class="tool-btn" onclick="insertTable()">📊</button>
-        <button class="tool-btn" onclick="toggleDarkMode()">🌙</button>
-        <button class="tool-btn" onclick="startVoiceInput()">🎤</button>
-        <button class="tool-btn" onclick="autoSuggest()">🤖</button>
-        <button class="tool-btn" onclick="grammarCheck()">📝</button> <!-- New: Grammar Check -->
-        <button class="tool-btn" onclick="wordCount()">🔢</button>
-        <button class="tool-btn" onclick="exportToPDF()">📤 PDF</button>
-        <button class="tool-btn" onclick="autoSave()">💾</button>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="radar-pulse"></div>
+            <h1 class="loading-title">SkyWatch</h1>
+            <p class="loading-status">Initializing radar systems...</p>
+        </div>
     </div>
-    <div id="editor" contenteditable="true" spellcheck="true"></div>
-    <script src="script.js"></script>
+
+    <!-- Main App Container -->
+    <div id="app" class="app-container">
+        
+        <!-- Map Container -->
+        <div id="map" class="map-container"></div>
+
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="logo">
+                <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24">
+                    <path d="M12 2L4 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-8-4z" fill="currentColor"/>
+                    <circle cx="12" cy="12" r="3" fill="#0a0e1a"/>
+                </svg>
+                <span class="logo-text">SkyWatch</span>
+            </div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="aircraft-count">0</span>
+                    <span class="stat-label">Aircraft</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="military-count">0</span>
+                    <span class="stat-label">Military</span>
+                </div>
+            </div>
+            <button class="menu-button" id="menu-toggle" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </header>
+
+        <!-- Side Panel -->
+        <aside class="side-panel" id="side-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">Controls</h2>
+                <button class="panel-close" id="panel-close" aria-label="Close">×</button>
+            </div>
+            
+            <div class="panel-content">
+                <!-- Search -->
+                <section class="control-section">
+                    <h3 class="section-title">Search</h3>
+                    <div class="search-container">
+                        <input type="text" 
+                               id="search-input" 
+                               class="search-input" 
+                               placeholder="Callsign or registration..."
+                               autocomplete="off">
+                        <button class="search-clear" id="search-clear" aria-label="Clear">×</button>
+                    </div>
+                </section>
+
+                <!-- Filters -->
+                <section class="control-section">
+                    <h3 class="section-title">Filters</h3>
+                    <div class="filter-group">
+                        <label class="filter-toggle">
+                            <input type="checkbox" id="filter-civilian" checked>
+                            <span class="toggle-label">Civilian Aircraft</span>
+                            <span class="toggle-indicator"></span>
+                        </label>
+                        <label class="filter-toggle">
+                            <input type="checkbox" id="filter-military" checked>
+                            <span class="toggle-label">Military Aircraft</span>
+                            <span class="toggle-indicator"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="range-control">
+                        <label class="range-label">
+                            <span>Min Altitude: <span id="min-altitude-value">0</span> ft</span>
+                            <input type="range" 
+                                   id="min-altitude" 
+                                   min="0" 
+                                   max="45000" 
+                                   step="1000" 
+                                   value="0"
+                                   class="range-slider">
+                        </label>
+                    </div>
+                    
+                    <div class="range-control">
+                        <label class="range-label">
+                            <span>Max Altitude: <span id="max-altitude-value">45000</span> ft</span>
+                            <input type="range" 
+                                   id="max-altitude" 
+                                   min="0" 
+                                   max="45000" 
+                                   step="1000" 
+                                   value="45000"
+                                   class="range-slider">
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Region Focus -->
+                <section class="control-section">
+                    <h3 class="section-title">Quick Focus</h3>
+                    <div class="region-buttons">
+                        <button class="region-button" data-region="middle-east">Middle East</button>
+                        <button class="region-button" data-region="europe">Europe</button>
+                        <button class="region-button" data-region="north-america">North America</button>
+                        <button class="region-button" data-region="asia">Asia Pacific</button>
+                        <button class="region-button" data-region="global">Global View</button>
+                    </div>
+                </section>
+
+                <!-- Time Controls -->
+                <section class="control-section">
+                    <h3 class="section-title">Playback</h3>
+                    <div class="time-controls">
+                        <button class="time-button" id="time-live">
+                            <span class="live-indicator"></span>
+                            Live
+                        </button>
+                        <button class="time-button" id="time-history">History</button>
+                    </div>
+                    <div class="time-scrubber" id="time-scrubber" style="display: none;">
+                        <input type="range" 
+                               id="time-slider" 
+                               min="0" 
+                               max="3600" 
+                               value="3600"
+                               class="range-slider">
+                        <span class="time-label" id="time-label">Now</span>
+                    </div>
+                </section>
+
+                <!-- Data Source Info -->
+                <section class="control-section">
+                    <h3 class="section-title">Data Source</h3>
+                    <div class="info-box">
+                        <p class="info-text">OpenSky Network API</p>
+                        <p class="info-subtext">Public ADS-B data • Updates every 10s</p>
+                        <p class="info-warning">⚠️ Military tracking limited to ADS-B equipped aircraft</p>
+                    </div>
+                </section>
+
+                <!-- Settings -->
+                <section class="control-section">
+                    <h3 class="section-title">Display</h3>
+                    <label class="filter-toggle">
+                        <input type="checkbox" id="show-trails" checked>
+                        <span class="toggle-label">Flight Trails</span>
+                        <span class="toggle-indicator"></span>
+                    </label>
+                    <label class="filter-toggle">
+                        <input type="checkbox" id="show-labels" checked>
+                        <span class="toggle-label">Aircraft Labels</span>
+                        <span class="toggle-indicator"></span>
+                    </label>
+                    <label class="filter-toggle">
+                        <input type="checkbox" id="cluster-mode">
+                        <span class="toggle-label">Cluster Mode</span>
+                        <span class="toggle-indicator"></span>
+                    </label>
+                </section>
+            </div>
+        </aside>
+
+        <!-- Aircraft Detail Card -->
+        <div class="aircraft-card" id="aircraft-card" style="display: none;">
+            <div class="card-header">
+                <div class="card-title-row">
+                    <h3 class="card-title" id="card-callsign">—</h3>
+                    <span class="card-badge" id="card-type">CIVILIAN</span>
+                </div>
+                <button class="card-close" id="card-close" aria-label="Close">×</button>
+            </div>
+            
+            <div class="card-content">
+                <div class="card-grid">
+                    <div class="card-item">
+                        <span class="card-label">Altitude</span>
+                        <span class="card-value" id="card-altitude">—</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="card-label">Speed</span>
+                        <span class="card-value" id="card-speed">—</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="card-label">Heading</span>
+                        <span class="card-value" id="card-heading">—</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="card-label">Vertical</span>
+                        <span class="card-value" id="card-vertical">—</span>
+                    </div>
+                </div>
+
+                <div class="card-section">
+                    <h4 class="card-section-title">Aircraft Info</h4>
+                    <div class="info-row">
+                        <span class="info-key">Registration:</span>
+                        <span class="info-value" id="card-registration">—</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">ICAO24:</span>
+                        <span class="info-value" id="card-icao">—</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">Origin:</span>
+                        <span class="info-value" id="card-origin">—</span>
+                    </div>
+                </div>
+
+                <button class="card-action" id="card-track">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                        <path d="M12 2v10l4 4" stroke-width="2"/>
+                    </svg>
+                    Track Aircraft
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin="anonymous"></script>
+    <script src="src/js/config.js"></script>
+    <script src="src/js/api.js"></script>
+    <script src="src/js/aircraft.js"></script>
+    <script src="src/js/map.js"></script>
+    <script src="src/js/ui.js"></script>
+    <script src="src/js/main.js"></script>
 </body>
 </html>
