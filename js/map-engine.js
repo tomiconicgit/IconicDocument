@@ -1,6 +1,6 @@
 /**
- * MAP ENGINE MODULE
- * Handles all Mapbox GL operations, markers, layers, animations
+ * MAP ENGINE MODULE - GOOGLE MAPS VERSION
+ * Handles all Google Maps operations, markers, layers, animations
  */
 
 export class MapEngine {
@@ -8,55 +8,177 @@ export class MapEngine {
         this.containerId = containerId;
         this.map = null;
         this.markers = new Map();
-        this.layers = new Map();
-        
-        // Use free Mapbox token - REPLACE WITH YOUR OWN
-        // Get free token at: https://account.mapbox.com/access-tokens/
-        mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXVzZXIiLCJhIjoiY2t4eHh4eHh4eHh4In0.example_token_replace_me';
+        this.circles = new Map();
+        this.polylines = new Map();
+        this.polygons = new Map();
+        this.infoWindows = new Map();
+        this.isInitialized = false;
     }
     
-    init() {
+    async init() {
         // Set loading background
-        document.getElementById(this.containerId).style.backgroundColor = '#0a1929';
+        const container = document.getElementById(this.containerId);
+        container.style.backgroundColor = '#0a1929';
         
         try {
-            this.map = new mapboxgl.Map({
-                container: this.containerId,
-                style: 'mapbox://styles/mapbox/dark-v11',
-                center: [54.0, 27.0], // Persian Gulf
-                zoom: 4.5,
-                pitch: 0,
-                bearing: 0,
-                antialias: true,
-                attributionControl: false
+            // Wait for Google Maps to load
+            await this.waitForGoogleMaps();
+            
+            // Initialize map with dark theme
+            this.map = new google.maps.Map(container, {
+                center: { lat: 27.0, lng: 54.0 }, // Persian Gulf
+                zoom: 6,
+                mapTypeId: 'hybrid', // Satellite with labels
+                styles: this.getDarkMapStyles(),
+                disableDefaultUI: true,
+                zoomControl: true,
+                mapTypeControl: false,
+                scaleControl: true,
+                streetViewControl: false,
+                rotateControl: true,
+                fullscreenControl: false,
+                gestureHandling: 'greedy',
+                tilt: 45,
+                backgroundColor: '#0a1929'
             });
             
-            this.map.on('load', () => {
-                this.onMapLoad();
-            });
+            this.isInitialized = true;
+            console.log('Google Maps loaded successfully');
             
-            this.map.on('error', (e) => {
-                console.error('Mapbox error:', e);
-                this.showMapError();
-            });
-            
-            // Add navigation controls
-            this.map.addControl(new mapboxgl.NavigationControl({
-                showCompass: true,
-                showZoom: true,
-                visualizePitch: true
-            }), 'bottom-right');
-            
-            // Add scale
-            this.map.addControl(new mapboxgl.ScaleControl({
-                maxWidth: 100,
-                unit: 'metric'
-            }));
+            // Add custom controls
+            this.addCustomControls();
             
         } catch (error) {
-            console.error('Failed to initialize map:', error);
+            console.error('Failed to initialize Google Maps:', error);
             this.showMapError();
         }
+    }
+    
+    async waitForGoogleMaps() {
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error('Google Maps failed to load'));
+            }, 10000);
+            
+            const checkGoogle = setInterval(() => {
+                if (typeof google !== 'undefined' && google.maps) {
+                    clearInterval(checkGoogle);
+                    clearTimeout(timeout);
+                    resolve();
+                }
+            }, 100);
+        });
+    }
+    
+    getDarkMapStyles() {
+        return [
+            { elementType: "geometry", stylers: [{ color: "#0a1929" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#0a1929" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#4a9eff" }] },
+            {
+                featureType: "administrative.locality",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#4a9eff" }]
+            },
+            {
+                featureType: "poi",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#8a9bb5" }]
+            },
+            {
+                featureType: "poi.park",
+                elementType: "geometry",
+                stylers: [{ color: "#1a2940" }]
+            },
+            {
+                featureType: "poi.park",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#6b9a76" }]
+            },
+            {
+                featureType: "road",
+                elementType: "geometry",
+                stylers: [{ color: "#1a2940" }]
+            },
+            {
+                featureType: "road",
+                elementType: "geometry.stroke",
+                stylers: [{ color: "#0a1929" }]
+            },
+            {
+                featureType: "road",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#8a9bb5" }]
+            },
+            {
+                featureType: "road.highway",
+                elementType: "geometry",
+                stylers: [{ color: "#2a3950" }]
+            },
+            {
+                featureType: "road.highway",
+                elementType: "geometry.stroke",
+                stylers: [{ color: "#1a2940" }]
+            },
+            {
+                featureType: "road.highway",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#4a9eff" }]
+            },
+            {
+                featureType: "transit",
+                elementType: "geometry",
+                stylers: [{ color: "#1a2940" }]
+            },
+            {
+                featureType: "transit.station",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#8a9bb5" }]
+            },
+            {
+                featureType: "water",
+                elementType: "geometry",
+                stylers: [{ color: "#0a1929" }]
+            },
+            {
+                featureType: "water",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#4a9eff" }]
+            },
+            {
+                featureType: "water",
+                elementType: "labels.text.stroke",
+                stylers: [{ color: "#0a1929" }]
+            }
+        ];
+    }
+    
+    addCustomControls() {
+        // Map type toggle button
+        const mapTypeButton = document.createElement('button');
+        mapTypeButton.textContent = 'Satellite';
+        mapTypeButton.className = 'custom-map-control';
+        mapTypeButton.style.cssText = `
+            background: rgba(18, 24, 38, 0.95);
+            border: 1px solid rgba(74, 158, 255, 0.3);
+            color: #4a9eff;
+            padding: 8px 12px;
+            margin: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        `;
+        
+        let isSatellite = true;
+        mapTypeButton.addEventListener('click', () => {
+            isSatellite = !isSatellite;
+            this.map.setMapTypeId(isSatellite ? 'hybrid' : 'roadmap');
+            mapTypeButton.textContent = isSatellite ? 'Satellite' : 'Map';
+        });
+        
+        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(mapTypeButton);
     }
     
     showMapError() {
@@ -76,113 +198,93 @@ export class MapEngine {
                 <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
                 <h2 style="margin-bottom: 10px; color: #4a9eff;">Map Loading Issue</h2>
                 <p style="color: #8a9bb5; max-width: 400px; line-height: 1.6;">
-                    Unable to load Mapbox map. Please:<br><br>
-                    1. Get a free token at <a href="https://account.mapbox.com" target="_blank" style="color: #4a9eff;">mapbox.com</a><br>
-                    2. Replace token in js/map-engine.js (line 14)<br>
-                    3. Refresh the page
+                    Unable to load Google Maps. Please:<br><br>
+                    1. Get a free API key at <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" style="color: #4a9eff;">Google Cloud Console</a><br>
+                    2. Enable Maps JavaScript API<br>
+                    3. Replace key in index.html (line 95)<br>
+                    4. Refresh the page
                 </p>
             </div>
         `;
     }
     
-    onMapLoad() {
-        console.log('Map loaded successfully');
-        
-        // Style water
-        if (this.map.getLayer('water')) {
-            this.map.setPaintProperty('water', 'water-color', '#0a1929');
-        }
-        
-        // Add atmosphere
-        this.map.setFog({
-            'color': 'rgb(186, 210, 235)',
-            'high-color': 'rgb(36, 92, 223)',
-            'horizon-blend': 0.02,
-            'space-color': 'rgb(11, 11, 25)',
-            'star-intensity': 0.6
-        });
-    }
-    
     flyTo(options) {
         if (!this.map) return;
-        this.map.flyTo({
-            ...options,
-            duration: 2000,
-            essential: true
-        });
+        
+        this.map.panTo({ lat: options.center[1], lng: options.center[0] });
+        this.map.setZoom(options.zoom || 6);
+        
+        if (options.tilt !== undefined) {
+            this.map.setTilt(options.tilt);
+        }
+        if (options.heading !== undefined) {
+            this.map.setHeading(options.heading);
+        }
     }
     
     addMarker({ id, coordinates, type, data, onClick }) {
         if (!this.map) return;
         
-        // Create custom marker element
-        const el = document.createElement('div');
-        el.className = `custom-marker marker-${type}`;
-        el.style.width = this.getMarkerSize(type) + 'px';
-        el.style.height = this.getMarkerSize(type) + 'px';
-        el.style.backgroundColor = this.getMarkerColor(type);
-        el.style.borderRadius = type === 'airbase' ? '4px' : '50%';
-        el.style.border = `2px solid ${this.getMarkerBorderColor(type)}`;
-        el.style.boxShadow = `0 0 20px ${this.getMarkerColor(type)}`;
-        el.style.cursor = 'pointer';
-        el.style.transition = 'all 0.3s ease';
+        const position = { lat: coordinates[1], lng: coordinates[0] };
         
-        // Add pulse animation for carriers
+        // Create custom marker icon
+        const icon = {
+            path: type === 'airbase' 
+                ? 'M 0,-2 L 2,2 L 0,1.5 L -2,2 Z' // Square for airbase
+                : google.maps.SymbolPath.CIRCLE, // Circle for others
+            fillColor: this.getMarkerColor(type),
+            fillOpacity: 1,
+            strokeColor: this.getMarkerBorderColor(type),
+            strokeWeight: 2,
+            scale: this.getMarkerSize(type),
+            anchor: new google.maps.Point(0, 0)
+        };
+        
+        const marker = new google.maps.Marker({
+            position: position,
+            map: this.map,
+            icon: icon,
+            title: data.name,
+            animation: type === 'carrier' ? google.maps.Animation.BOUNCE : null,
+            zIndex: type === 'carrier' ? 1000 : 500
+        });
+        
+        // Stop bounce animation after 2 seconds for carriers
         if (type === 'carrier') {
-            el.style.animation = 'marker-pulse 2s ease-in-out infinite';
+            setTimeout(() => {
+                marker.setAnimation(null);
+            }, 2000);
         }
         
-        // Hover effect
-        el.addEventListener('mouseenter', () => {
-            el.style.transform = 'scale(1.3)';
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            el.style.transform = 'scale(1)';
-        });
-        
-        // Click handler
+        // Add click handler
         if (onClick) {
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                onClick();
-            });
+            marker.addListener('click', onClick);
         }
         
-        // Create and add marker
-        const marker = new mapboxgl.Marker(el)
-            .setLngLat(coordinates)
-            .addTo(this.map);
+        // Add hover effect
+        marker.addListener('mouseover', () => {
+            marker.setIcon({
+                ...icon,
+                scale: icon.scale * 1.3
+            });
+        });
+        
+        marker.addListener('mouseout', () => {
+            marker.setIcon(icon);
+        });
         
         this.markers.set(id, { marker, data, type });
-        
-        // Add CSS animation if not already present
-        this.addMarkerAnimationStyle();
-    }
-    
-    addMarkerAnimationStyle() {
-        if (!document.getElementById('marker-animations')) {
-            const style = document.createElement('style');
-            style.id = 'marker-animations';
-            style.textContent = `
-                @keyframes marker-pulse {
-                    0%, 100% { opacity: 1; transform: scale(1); }
-                    50% { opacity: 0.7; transform: scale(1.1); }
-                }
-            `;
-            document.head.appendChild(style);
-        }
     }
     
     getMarkerSize(type) {
         const sizes = {
-            carrier: 20,
-            destroyer: 14,
-            airbase: 16,
-            allied: 12,
-            target: 12
+            carrier: 12,
+            destroyer: 8,
+            airbase: 10,
+            allied: 7,
+            target: 7
         };
-        return sizes[type] || 12;
+        return sizes[type] || 7;
     }
     
     getMarkerColor(type) {
@@ -198,138 +300,161 @@ export class MapEngine {
     
     getMarkerBorderColor(type) {
         const colors = {
-            carrier: 'rgba(74, 158, 255, 0.8)',
-            destroyer: 'rgba(74, 158, 255, 0.6)',
-            airbase: 'rgba(255, 187, 74, 0.8)',
-            allied: 'rgba(74, 255, 136, 0.8)',
-            target: 'rgba(255, 74, 95, 0.8)'
+            carrier: '#ffffff',
+            destroyer: '#ffffff',
+            airbase: '#ffffff',
+            allied: '#ffffff',
+            target: '#ffffff'
         };
-        return colors[type] || 'rgba(255, 255, 255, 0.5)';
+        return colors[type] || '#ffffff';
     }
     
     addCircle({ id, center, radius, color, borderColor }) {
         if (!this.map) return;
         
-        const circleGeoJSON = turf.circle(center, radius / 1000, {
-            steps: 64,
-            units: 'kilometers'
+        const circle = new google.maps.Circle({
+            strokeColor: borderColor,
+            strokeOpacity: 0.6,
+            strokeWeight: 2,
+            fillColor: color,
+            fillOpacity: 0.2,
+            map: this.map,
+            center: { lat: center[1], lng: center[0] },
+            radius: radius
         });
         
-        // Add source
-        this.map.addSource(id, {
-            type: 'geojson',
-            data: circleGeoJSON
-        });
-        
-        // Add fill layer
-        this.map.addLayer({
-            id: `${id}-fill`,
-            type: 'fill',
-            source: id,
-            paint: {
-                'fill-color': color,
-                'fill-opacity': 0.3
-            }
-        });
-        
-        // Add border layer
-        this.map.addLayer({
-            id: `${id}-border`,
-            type: 'line',
-            source: id,
-            paint: {
-                'line-color': borderColor,
-                'line-width': 2,
-                'line-opacity': 0.6
-            }
-        });
-        
-        this.layers.set(id, { type: 'circle', sourceId: id });
+        this.circles.set(id, circle);
     }
     
-    addLine({ id, coordinates, color, width, animated }) {
+    addLine({ id, coordinates, color, width }) {
         if (!this.map) return;
         
-        this.map.addSource(id, {
-            type: 'geojson',
-            data: {
-                type: 'Feature',
-                geometry: {
-                    type: 'LineString',
-                    coordinates: coordinates
+        const path = coordinates.map(coord => ({
+            lat: coord[1],
+            lng: coord[0]
+        }));
+        
+        const polyline = new google.maps.Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: color,
+            strokeOpacity: 0.8,
+            strokeWeight: width || 3,
+            map: this.map
+        });
+        
+        this.polylines.set(id, polyline);
+    }
+    
+    addArc({ id, start, end, color }) {
+        if (!this.map) return;
+        
+        // Create curved path using intermediate points
+        const startLatLng = { lat: start[1], lng: start[0] };
+        const endLatLng = { lat: end[1], lng: end[0] };
+        
+        // Calculate midpoint with elevation
+        const midLat = (start[1] + end[1]) / 2;
+        const midLng = (start[0] + end[0]) / 2;
+        
+        // Add curvature
+        const latOffset = (end[1] - start[1]) * 0.2;
+        const lngOffset = (end[0] - start[0]) * 0.2;
+        
+        const path = [
+            startLatLng,
+            { lat: midLat + latOffset, lng: midLng + lngOffset },
+            endLatLng
+        ];
+        
+        const polyline = new google.maps.Polyline({
+            path: path,
+            geodesic: false,
+            strokeColor: color,
+            strokeOpacity: 0.7,
+            strokeWeight: 2,
+            map: this.map,
+            icons: [{
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    scale: 3,
+                    fillColor: color,
+                    fillOpacity: 0.8,
+                    strokeWeight: 1,
+                    strokeColor: '#ffffff'
+                },
+                offset: '100%'
+            }]
+        });
+        
+        this.polylines.set(id, polyline);
+        
+        // Animate the arc
+        this.animateArc(polyline, color);
+    }
+    
+    animateArc(polyline, color) {
+        let count = 0;
+        const animate = () => {
+            count = (count + 1) % 200;
+            const icons = polyline.get('icons');
+            icons[0].offset = (count / 2) + '%';
+            polyline.set('icons', icons);
+            
+            setTimeout(() => {
+                if (this.polylines.size > 0) {
+                    requestAnimationFrame(animate);
                 }
-            }
-        });
-        
-        this.map.addLayer({
-            id: id,
-            type: 'line',
-            source: id,
-            paint: {
-                'line-color': color,
-                'line-width': width || 3,
-                'line-opacity': 0.8
-            }
-        });
-        
-        this.layers.set(id, { type: 'line', sourceId: id });
-    }
-    
-    addArc({ id, start, end, color, height }) {
-        if (!this.map) return;
-        
-        // Create curved arc using Turf.js
-        const line = turf.lineString([start, end]);
-        const bezier = turf.bezierSpline(line);
-        
-        this.addLine({
-            id: id,
-            coordinates: bezier.geometry.coordinates,
-            color: color,
-            width: 2,
-            animated: true
-        });
+            }, 50);
+        };
+        animate();
     }
     
     clearLayers() {
         // Remove all markers
-        this.markers.forEach(({ marker }) => marker.remove());
+        this.markers.forEach(({ marker }) => marker.setMap(null));
         this.markers.clear();
         
-        // Remove all layers
-        this.layers.forEach(({ sourceId }, layerId) => {
-            if (this.map.getLayer(layerId)) {
-                this.map.removeLayer(layerId);
-            }
-            if (this.map.getLayer(`${layerId}-fill`)) {
-                this.map.removeLayer(`${layerId}-fill`);
-            }
-            if (this.map.getLayer(`${layerId}-border`)) {
-                this.map.removeLayer(`${layerId}-border`);
-            }
-            if (this.map.getSource(sourceId)) {
-                this.map.removeSource(sourceId);
-            }
-        });
-        this.layers.clear();
+        // Remove all circles
+        this.circles.forEach(circle => circle.setMap(null));
+        this.circles.clear();
+        
+        // Remove all polylines
+        this.polylines.forEach(polyline => polyline.setMap(null));
+        this.polylines.clear();
+        
+        // Remove all polygons
+        this.polygons.forEach(polygon => polygon.setMap(null));
+        this.polygons.clear();
     }
     
     removeLayer(id) {
-        const layer = this.layers.get(id);
-        if (layer && this.map) {
-            if (this.map.getLayer(id)) {
-                this.map.removeLayer(id);
-            }
-            if (this.map.getLayer(`${id}-fill`)) {
-                this.map.removeLayer(`${id}-fill`);
-            }
-            if (this.map.getLayer(`${id}-border`)) {
-                this.map.removeLayer(`${id}-border`);
-            }
-            if (this.map.getSource(layer.sourceId)) {
-                this.map.removeSource(layer.sourceId);
-            }
-            this.layers.delete(id);
+        // Remove marker
+        const marker = this.markers.get(id);
+        if (marker) {
+            marker.marker.setMap(null);
+            this.markers.delete(id);
+        }
+        
+        // Remove circle
+        const circle = this.circles.get(id);
+        if (circle) {
+            circle.setMap(null);
+            this.circles.delete(id);
+        }
+        
+        // Remove polyline
+        const polyline = this.polylines.get(id);
+        if (polyline) {
+            polyline.setMap(null);
+            this.polylines.delete(id);
+        }
+        
+        // Remove polygon
+        const polygon = this.polygons.get(id);
+        if (polygon) {
+            polygon.setMap(null);
+            this.polygons.delete(id);
         }
     }
 }
