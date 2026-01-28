@@ -7,13 +7,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Iran Strike Analysis Visualizer</title>
     
-    <!-- Mapbox GL JS -->
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    
-    <!-- Turf.js for geospatial calculations -->
-    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/mobile.css">
@@ -148,6 +141,9 @@
         <span></span>
     </button>
 
+    <!-- Google Maps API - REPLACE WITH YOUR KEY -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&libraries=geometry,visualization&loading=async" defer></script>
+    
     <!-- Scripts -->
     <script type="module" src="js/main.js"></script>
 </body>
